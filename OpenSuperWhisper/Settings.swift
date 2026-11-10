@@ -90,6 +90,12 @@ class SettingsViewModel: ObservableObject {
         }
     }
 
+    @Published var filterWhisperHallucinations: Bool {
+        didSet {
+            AppPreferences.shared.filterWhisperHallucinations = filterWhisperHallucinations
+        }
+    }
+
     @Published var showTimestamps: Bool {
         didSet {
             AppPreferences.shared.showTimestamps = showTimestamps
@@ -213,6 +219,7 @@ class SettingsViewModel: ObservableObject {
         self.fluidAudioModelVersion = prefs.fluidAudioModelVersion
         self.selectedLanguage = prefs.whisperLanguage
         self.suppressBlankAudio = prefs.suppressBlankAudio
+        self.filterWhisperHallucinations = prefs.filterWhisperHallucinations
         self.showTimestamps = prefs.showTimestamps
         self.temperature = prefs.temperature
         self.noSpeechThreshold = prefs.noSpeechThreshold
@@ -645,6 +652,8 @@ struct Settings {
     
     var selectedLanguage: String
     var suppressBlankAudio: Bool
+    var filterWhisperHallucinations: Bool
+    var whisperFilterPhrases: WhisperPhraseList
     var showTimestamps: Bool
     var temperature: Double
     var noSpeechThreshold: Double
@@ -665,6 +674,8 @@ struct Settings {
         let prefs = AppPreferences.shared
         self.selectedLanguage = prefs.whisperLanguage
         self.suppressBlankAudio = prefs.suppressBlankAudio
+        self.whisperFilterPhrases = .load()
+        self.filterWhisperHallucinations = prefs.filterWhisperHallucinations
         self.showTimestamps = prefs.showTimestamps
         self.temperature = prefs.temperature
         self.noSpeechThreshold = prefs.noSpeechThreshold
@@ -680,6 +691,7 @@ struct SettingsView: View {
     @StateObject private var permissionsManager = PermissionsManager()
     @Environment(\.dismiss) var dismiss
     @State private var isRecordingNewShortcut = false
+    @State private var showsWhisperPhrases = false
     @State private var selectedTab = 0
     @State private var previousModelURL: URL?
     
@@ -944,6 +956,27 @@ struct SettingsView: View {
                             Toggle("", isOn: $viewModel.suppressBlankAudio)
                                 .toggleStyle(SwitchToggleStyle(tint: Color.accentColor))
                                 .labelsHidden()
+                        }
+
+                        if viewModel.selectedEngine == "whisper" {
+                            VStack(alignment: .leading, spacing: 5) {
+                                Toggle(isOn: $viewModel.filterWhisperHallucinations) {
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text("Filter Known Whisper Phrases")
+                                            .font(.subheadline)
+                                        Text("Removes common subtitle credits and closing phrases. Turn off when dictating these phrases intentionally.")
+                                            .font(.caption)
+                                            .foregroundColor(.secondary)
+                                    }
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                }
+                                .toggleStyle(SwitchToggleStyle(tint: Color.accentColor))
+                                Button("Посмотреть фразы…") { showsWhisperPhrases = true }
+                                    .controlSize(.small)
+                                    .sheet(isPresented: $showsWhisperPhrases) {
+                                        WhisperPhraseEditor(phrases: .load())
+                                    }
+                            }
                         }
                         
                         HStack {

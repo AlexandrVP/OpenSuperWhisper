@@ -68,6 +68,9 @@ final class AppPreferences {
     // Transcription settings
     @UserDefault(key: "suppressBlankAudio", defaultValue: true)
     var suppressBlankAudio: Bool
+
+    @UserDefault(key: "filterWhisperHallucinations", defaultValue: true)
+    var filterWhisperHallucinations: Bool
     
     @UserDefault(key: "showTimestamps", defaultValue: false)
     var showTimestamps: Bool

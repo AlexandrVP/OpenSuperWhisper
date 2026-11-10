@@ -267,11 +267,11 @@ class WhisperEngine: TranscriptionEngine {
         
         try Task.checkCancellation()
         
-        var segmentTexts: [String] = []
         var decodedSegments: [DecodedSegment] = []
+        var segmentStarts: [Int64] = []
         let nSegments = context.fullNSegments
-        segmentTexts.reserveCapacity(nSegments)
         decodedSegments.reserveCapacity(nSegments)
+        segmentStarts.reserveCapacity(nSegments)
         
         for i in 0..<nSegments {
             if i % 5 == 0 {
@@ -280,15 +280,37 @@ class WhisperEngine: TranscriptionEngine {
             
             guard let segmentText = context.fullGetSegmentText(iSegment: i) else { continue }
             let segmentEnd = context.fullGetSegmentT1(iSegment: i)
+            segmentStarts.append(context.fullGetSegmentT0(iSegment: i))
             decodedSegments.append(
                 DecodedSegment(
                     text: segmentText,
                     endTimeCentiseconds: segmentEnd
                 )
             )
-            
+        }
+
+        // Match before timestamp formatting, across decoder boundaries. Keep
+        // detailed segments raw for diagnostics and long-form regression tests.
+        let rawTexts = decodedSegments.map(\.text)
+        let filteredTexts = WhisperHallucinationFilter.filterSegments(
+            rawTexts,
+            enabled: settings.filterWhisperHallucinations,
+            phrases: settings.whisperFilterPhrases
+        )
+        let didFilter = filteredTexts != rawTexts
+        var segmentTexts: [String] = []
+        segmentTexts.reserveCapacity(filteredTexts.count)
+        for (index, segmentText) in filteredTexts.enumerated() {
+            if index % 5 == 0 { try Task.checkCancellation() }
+            // Preserve whitespace-only decoder segments in plain text: they
+            // may separate real words. Avoid empty timestamp-only lines after
+            // a removal, while keeping the original output when disabled.
+            if didFilter && settings.showTimestamps && segmentText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                continue
+            }
             if settings.showTimestamps {
-                let t0 = context.fullGetSegmentT0(iSegment: i)
+                let t0 = segmentStarts[index]
+                let segmentEnd = decodedSegments[index].endTimeCentiseconds
                 segmentTexts.append(
                     String(format: "[%.1f->%.1f] ", Float(t0) / 100.0, Float(segmentEnd) / 100.0)
                         + segmentText
