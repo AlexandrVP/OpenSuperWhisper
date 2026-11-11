@@ -526,6 +526,15 @@ struct OnboardingView: View {
     }
 
     private func handleContinueButtonTap() {
+        guard let model = viewModel.unifiedModels.first(where: {
+            $0.id == viewModel.selectedModelId && $0.isDownloaded
+        }) else { return }
+
+        // The queue can create the shared service before onboarding has a model.
+        // Apply the choice and clear that initial load failure before ContentView
+        // subscribes to loadingError. Also handles models found on disk at launch.
+        viewModel.selectModel(model)
+        TranscriptionService.shared.reloadEngine()
         appState.hasCompletedOnboarding = true
     }
 }
