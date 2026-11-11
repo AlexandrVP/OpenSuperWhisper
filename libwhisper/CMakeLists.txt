@@ -4,7 +4,7 @@
 cmake_minimum_required(VERSION 3.30)
 
 set(CMAKE_CXX_FLAGS_INIT "-fvisibility=hidden")
-set(CMAKE_OSX_DEPLOYMENT_TARGET "14.0")
+set(CMAKE_OSX_DEPLOYMENT_TARGET "14.0" CACHE STRING "Minimum supported macOS version")
 
 project(libwhisper)
 

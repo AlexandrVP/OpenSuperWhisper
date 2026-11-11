@@ -1,4 +1,6 @@
-# OpenSuperWhisper
+# OpenSuperWhisper — editable Whisper phrase filter
+
+Fork of [Starmel/OpenSuperWhisper](https://github.com/Starmel/OpenSuperWhisper) with an editable filter for recurring Whisper phrases.
 
 OpenSuperWhisper is a macOS application that provides real-time audio transcription using the Whisper model. It offers a seamless way to record and transcribe audio with customizable settings and keyboard shortcuts.
 
@@ -20,16 +22,17 @@ OpenSuperWhisper is a macOS application that provides real-time audio transcript
 
 ## Installation
 
-```shell
-brew update # Optional
-brew install opensuperwhisper
-```
+Download the **macOS arm64 ZIP** from [the latest release](https://github.com/AlexandrVP/OpenSuperWhisper/releases/latest), extract it and move `OpenSuperWhisper.app` to Applications. No Xcode or Homebrew is needed. The “Source code” archives are for developers.
 
-Or from [GitHub releases page](https://github.com/Starmel/OpenSuperWhisper/releases).
+**Requires Apple Silicon (M1 or newer) and macOS 15 or newer.** Intel Macs are not supported.
 
-## Requirements
+This fork's builds are ad-hoc signed and not notarized by Apple. On first launch a trusted download may need **System Settings → Privacy & Security → Open Anyway**. Grant Microphone, Accessibility and Input Monitoring, restart the app, select your microphone and download a model. Models are not bundled.
 
-- macOS (Apple Silicon/ARM64)
+**[Инструкция по установке на русском / Installation guide](docs/install.md)**
+
+The filter is under Settings → Transcription → Output Options → **Filter Known Whisper Phrases**. Use **«Посмотреть фразы…»** to edit the lists. See [filter behavior](docs/whisper_hallucination_filter.md).
+
+`brew install opensuperwhisper` installs the upstream app; use this fork's release ZIP for the editable filter.
 
 ## Support
 
@@ -40,17 +43,16 @@ If you encounter any issues or have questions, please:
 
 ## Building locally
 
-To build locally, you'll need:
+Requires full Xcode 26.2 or newer and an Apple Silicon Mac. Open Xcode once to complete setup.
 
-    git clone git@github.com:Starmel/OpenSuperWhisper.git
-    cd OpenSuperWhisper
-    git submodule update --init --recursive
-    brew install cmake libomp rust ruby
-    gem install xcpretty
-    ./run.sh build
+```sh
+git clone --recurse-submodules https://github.com/AlexandrVP/OpenSuperWhisper.git
+cd OpenSuperWhisper
+brew install cmake libomp rust
+DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer bash Scripts/build-release.sh 0.1.1
+```
 
-In case of problems, consult `.github/workflows/build.yml` which is our CI workflow
-where the app gets built automatically on GitHub's CI.
+The ZIP and SHA-256 checksum are written to `dist/`. GitHub Actions builds the same ZIP for branch pushes and pull requests; pushing a `vMAJOR.MINOR.PATCH` tag publishes a release after successful checks. See [release maintenance](docs/release_build.md).
 
 ## Contributing
 
