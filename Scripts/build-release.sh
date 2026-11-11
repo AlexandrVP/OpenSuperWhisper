@@ -68,7 +68,7 @@ xcrun swiftc -D FILTER_STANDALONE_TEST \
 build/phrase-filter-tests
 
 xcodebuild -project OpenSuperWhisper.xcodeproj -scheme OpenSuperWhisper \
-    -configuration Release -destination 'platform=macOS,arch=arm64' \
+    -configuration Release -destination 'generic/platform=macOS' \
     -derivedDataPath build -clonedSourcePackagesDirPath SourcePackages \
     -onlyUsePackageVersionsFromResolvedFile \
     -skipPackagePluginValidation -skipMacroValidation \
