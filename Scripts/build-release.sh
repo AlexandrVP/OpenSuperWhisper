@@ -10,8 +10,8 @@ if [[ ! "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || [[ ! "$build_number" =~ ^[0
     echo "Usage: BUILD_NUMBER=14 $0 0.1.1" >&2
     exit 1
 fi
-if [[ "$(uname -m)" != arm64 ]]; then
-    echo "Build this release on an Apple Silicon Mac." >&2
+if [[ "$(uname -s)" != Darwin ]]; then
+    echo "Build this release on macOS with full Xcode." >&2
     exit 1
 fi
 xcodebuild -version
@@ -21,12 +21,32 @@ test -f asian-autocorrect/autocorrect/Cargo.toml
 export MACOSX_DEPLOYMENT_TARGET="$deployment_target"
 mkdir -p build dist
 
+# Fetch the ARM64/macOS 15 bottle even on an Intel or newer macOS build host.
+# Verify the pinned Homebrew checksum; do not install the foreign-architecture bottle.
+omp_bottle="$(python3 Scripts/fetch-libomp.py build/libomp-arm64-sequoia.tar.gz)"
+omp_stage="$(mktemp -d "$PWD/build/libomp-bottle.XXXXXX")"
+tar -xzf "$omp_bottle" -C "$omp_stage"
+omp_prefix="$(python3 - "$omp_stage" <<'OMP'
+from pathlib import Path
+import sys
+libraries = list(Path(sys.argv[1]).glob("libomp/*/lib/libomp.dylib"))
+assert len(libraries) == 1, libraries
+print(libraries[0].parent.parent)
+OMP
+)"
+cp "$omp_prefix/lib/libomp.dylib" build/
+
 # M1-compatible instructions, with no detection of the build machine's CPU.
 cmake -G Xcode -B libwhisper/build -S libwhisper \
     -DCMAKE_OSX_ARCHITECTURES=arm64 \
     -DCMAKE_OSX_DEPLOYMENT_TARGET="$deployment_target" \
     -DGGML_NATIVE=OFF -DGGML_CPU_ARM_ARCH=armv8.2-a+dotprod+fp16 \
-    -DGGML_METAL_EMBED_LIBRARY=ON
+    -DGGML_METAL_EMBED_LIBRARY=ON \
+    "-DOpenMP_ROOT=$omp_prefix" \
+    "-DOpenMP_C_FLAGS=-Xclang -fopenmp" "-DOpenMP_CXX_FLAGS=-Xclang -fopenmp" \
+    "-DOpenMP_C_INCLUDE_DIR=$omp_prefix/include" "-DOpenMP_CXX_INCLUDE_DIR=$omp_prefix/include" \
+    -DOpenMP_C_LIB_NAMES=libomp -DOpenMP_CXX_LIB_NAMES=libomp \
+    "-DOpenMP_libomp_LIBRARY=$PWD/build/libomp.dylib"
 
 CARGO_PROFILE_RELEASE_LTO=true \
 CARGO_PROFILE_RELEASE_CODEGEN_UNITS=1 \
@@ -35,7 +55,6 @@ CARGO_PROFILE_RELEASE_PANIC=abort \
 cargo build --locked --release --target aarch64-apple-darwin \
     --manifest-path libautocorrect/Cargo.toml
 cp libautocorrect/target/aarch64-apple-darwin/release/libautocorrect_swift.dylib build/
-cp "$(brew --prefix libomp)/lib/libomp.dylib" build/
 for library in libautocorrect_swift libomp; do
     chmod u+w "build/$library.dylib"
     install_name_tool -id "@rpath/$library.dylib" "build/$library.dylib"
@@ -74,7 +93,7 @@ python3 Scripts/verify-release.py "$app"
 
 # A clean CI account has no models or permissions. The onboarding app must still
 # launch without a dyld error, unsupported CPU instruction or missing resource.
-if [[ "${CI:-}" == true ]]; then
+if [[ "${CI:-}" == true && "$(uname -m)" == arm64 ]]; then
     python3 - "$app/Contents/MacOS/OpenSuperWhisper" <<'SMOKE'
 import subprocess
 import sys
@@ -93,6 +112,8 @@ with open("build/launch-smoke.log", "w") as log:
     else:
         raise SystemExit(f"App exited during launch (status {result}); see build/launch-smoke.log")
 SMOKE
+elif [[ "${CI:-}" == true ]]; then
+    echo "ARM64 app launch must be tested on Apple Silicon; this host is Intel."
 fi
 
 staging="$(mktemp -d "$PWD/build/release-stage.XXXXXX")"
@@ -101,7 +122,7 @@ ditto "$app" "$staging/OpenSuperWhisper.app"
 cp docs/install.md "$staging/INSTALL.md"
 cp LICENSE "$staging/LICENSE.txt"
 mkdir -p "$staging/ThirdPartyLicenses"
-cp "$(brew --prefix libomp)/LICENSE.TXT" "$staging/ThirdPartyLicenses/libomp-LICENSE.txt"
+cp "$omp_prefix/LICENSE.TXT" "$staging/ThirdPartyLicenses/libomp-LICENSE.txt"
 for dependency in libwhisper/whisper.cpp asian-autocorrect SourcePackages/checkouts/*; do
     if [[ -d "$dependency" ]]; then
         while IFS= read -r -d '' license; do

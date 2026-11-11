@@ -2,7 +2,7 @@
 
 `.github/workflows/build.yml` builds and validates an Apple Silicon Release ZIP
 on every branch push and pull request. GitHub Actions must be enabled on the fork.
-The workflow uses macOS 15 ARM64 with Xcode 26.2 (Swift 6.2), the committed Swift
+The workflow cross-compiles on macOS 15 Intel with Xcode 26.2 (Swift 6.2), the committed Swift
 package pins, Cargo.lock and recursive submodules. No Apple or GitHub personal
 access tokens are required: only the publishing job gets `contents: write` via
 the short-lived `GITHUB_TOKEN` provided by GitHub Actions.
@@ -31,10 +31,14 @@ https://github.com/AlexandrVP/OpenSuperWhisper/releases/latest
 
 ## Build locally
 
-Requires an Apple Silicon Mac, full Xcode 26.2 or newer, Homebrew, and initialized
-submodules. On macOS 15 the bundled Homebrew libomp is checked against that OS
-target. If a newer OS's Homebrew library requires a newer system, validation fails;
-use the macOS 15 workflow instead of mislabelling an incompatible archive.
+Requires a Mac, full Xcode 26.2 or newer, Homebrew, Rust with the
+`aarch64-apple-darwin` target, and initialized submodules. The script fetches the
+pinned Homebrew ARM64/macOS 15 libomp bottle (with SHA-256 verification) on either host
+architecture; it does not install that bottle. All bundled Mach-O deployment
+targets are checked. With rustup, run `rustup target add aarch64-apple-darwin`.
+Filter tests run on the host architecture. The app launch smoke test runs only
+on ARM64 hosts; an Intel build requires a separate installation/launch check on
+Apple Silicon before claiming runtime verification.
 
 ```sh
 git submodule update --init --recursive

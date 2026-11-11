@@ -43,7 +43,7 @@ If you encounter any issues or have questions, please:
 
 ## Building locally
 
-Requires full Xcode 26.2 or newer and an Apple Silicon Mac. Open Xcode once to complete setup.
+Requires full Xcode 26.2 or newer and Rust targeting `aarch64-apple-darwin`. Open Xcode once to complete setup. Intel Macs can cross-compile the ARM64 app; running it requires Apple Silicon.
 
 ```sh
 git clone --recurse-submodules https://github.com/AlexandrVP/OpenSuperWhisper.git
