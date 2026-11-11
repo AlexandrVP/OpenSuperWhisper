@@ -3,11 +3,11 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-version="${1:-0.1.1}"
+version="${1:-0.1.2}"
 build_number="${BUILD_NUMBER:-14}"
 deployment_target="15.0"
 if [[ ! "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || [[ ! "$build_number" =~ ^[0-9]+$ ]]; then
-    echo "Usage: BUILD_NUMBER=14 $0 0.1.1" >&2
+    echo "Usage: BUILD_NUMBER=14 $0 0.1.2" >&2
     exit 1
 fi
 if [[ "$(uname -s)" != Darwin ]]; then

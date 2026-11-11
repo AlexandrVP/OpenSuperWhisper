@@ -39,7 +39,7 @@ jobs:
           REF_TYPE: ${{ github.ref_type }}
           REF_NAME: ${{ github.ref_name }}
         run: |
-          version=0.1.1
+          version=0.1.2
           if [[ "$REF_TYPE" == tag ]]; then
             version="${REF_NAME#v}"
           fi

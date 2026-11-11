@@ -1,5 +1,9 @@
 Готовая версия форка AlexandrVP с фильтром повторяющихся фраз Whisper.
 
+Исправлен первый запуск: после скачивания модели кнопка **Continue** загружает
+выбранную модель и очищает ошибку, возникшую до её выбора. Перезапуск для применения
+выбора модели больше не нужен.
+
 - Фильтр субтитров и типичных завершающих фраз с переключателем в настройках.
 - Редактирование списка фраз прямо в приложении, сохранение своего списка.
 - Автоматическая сборка Release для Apple Silicon с базовыми инструкциями M1.
@@ -21,6 +25,9 @@
 разрешения из-за смены локальной подписи. Intel Macs не поддерживаются.
 
 ### English
+
+Fixes first-run setup: Continue now loads the selected model and clears the
+initial missing-model error. Restarting to apply the model selection is no longer needed.
 
 Download the arm64 ZIP, extract it and move the app to Applications. Requires
 Apple Silicon and macOS 15+. All native libraries are bundled; models are
