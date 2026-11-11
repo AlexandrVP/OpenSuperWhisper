@@ -26,6 +26,8 @@ def verify(app, prepare=False):
     for key in ("NSMicrophoneUsageDescription", "NSAccessibilityUsageDescription"):
         if not info.get(key):
             raise RuntimeError(f"Missing {key}")
+    if not (contents / "Resources" / "ggml-silero-v5.1.2.bin").is_file():
+        raise RuntimeError("Missing bundled voice-activity detection model")
     frameworks = contents / "Frameworks"
     binaries = []
     for path in sorted(contents.rglob("*")):

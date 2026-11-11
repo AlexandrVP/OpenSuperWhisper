@@ -72,6 +72,29 @@ codesign --force --sign - --timestamp=none \
     --entitlements OpenSuperWhisper/OpenSuperWhisper.entitlements "$app"
 python3 Scripts/verify-release.py "$app"
 
+# A clean CI account has no models or permissions. The onboarding app must still
+# launch without a dyld error, unsupported CPU instruction or missing resource.
+if [[ "${CI:-}" == true ]]; then
+    python3 - "$app/Contents/MacOS/OpenSuperWhisper" <<'SMOKE'
+import subprocess
+import sys
+with open("build/launch-smoke.log", "w") as log:
+    process = subprocess.Popen([sys.argv[1]], stdout=log, stderr=subprocess.STDOUT)
+    try:
+        result = process.wait(timeout=10)
+    except subprocess.TimeoutExpired:
+        process.terminate()
+        try:
+            process.wait(timeout=5)
+        except subprocess.TimeoutExpired:
+            process.kill()
+            process.wait()
+        print("PASS: app stayed running on a clean macOS account")
+    else:
+        raise SystemExit(f"App exited during launch (status {result}); see build/launch-smoke.log")
+SMOKE
+fi
+
 staging="$(mktemp -d "$PWD/build/release-stage.XXXXXX")"
 trap 'rm -rf "$staging"' EXIT
 ditto "$app" "$staging/OpenSuperWhisper.app"
