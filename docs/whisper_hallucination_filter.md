@@ -1,21 +1,26 @@
-# Whisper phrase filter
+# Shared transcription phrase filter
 
-`WhisperHallucinationFilter` is a small, opt-out text postprocessor for the
-Whisper engine. Settings > Transcription > Output Options contains **Filter
-Known Whisper Phrases**. The preference `filterWhisperHallucinations` defaults
+`WhisperHallucinationFilter` is a small, opt-out text postprocessor shared by
+Whisper and both Parakeet versions (v2/v3) since release 0.1.3. Settings >
+Transcription > Output Options contains **Filter Known Phrases** for either engine
+(named **Filter Known Whisper Phrases** before 0.1.3). The preference `filterWhisperHallucinations` defaults
 to true in this patched source. **Посмотреть фразы…** opens two editable lists:
 whole sentences anywhere, and closing sentences at the end of a recording. Use one
 phrase per line. Save applies both lists to subsequent transcriptions and persists
 them locally. Empty lists are supported. Cancel discards the draft, including a
 pending restore of the defaults. The token `{И.Фамилия}` matches a Cyrillic initial
-and surname, such as М. Лосева. Parakeet is unaffected.
+and surname, such as М. Лосева. The existing preference keys are retained, so
+updating preserves custom lists and the enabled/disabled switch. The settings are
+shared across engines, not separate per model. Parakeet v2 remains English-only.
 
 The filter recognises a curated set of Russian/English subtitle credits as
 complete sentences or lines, and a few common sign-offs only at the end of a
 transcript. Matching is case-insensitive. It operates on joined decoder text,
 then maps the deleted ranges back to their source segments before timestamp
 formatting. Raw `DetailedTranscription.segments` remain available for diagnostics.
-File transcription and live dictation share this code path.
+Parakeet v2 and v3 both use `FluidAudioEngine`, which filters `result.text` before
+trimming and Asian autocorrection. The Whisper segment/timestamp path is unchanged.
+File transcription and live dictation use the filter in their selected engine.
 
 Ordinary replies, mentions inside longer sentences, and quoted examples are
 preserved by the covered rules. This is a heuristic: a genuinely spoken
@@ -61,3 +66,13 @@ the filter, and every character boundary between two decoder segments.
 Building the complete app requires full Xcode and the repository's existing
 native dependencies/submodules; see `run.sh` and `.github/workflows/build.yml`.
 Command-line tools alone can validate the filter, not the complete app/UI.
+
+## Parakeet integration checks
+
+Run `bash Scripts/check-parakeet-filter.sh` with Apple's Swift command-line tools.
+It compiles the production `FluidAudioEngine` and filter against a test-only
+FluidAudio module that returns controlled decoder text. Both v2 and v3 paths are
+checked for default/custom phrases, disabling, empty lists, ordinary speech and
+autocorrection order. This verifies the engine integration without downloading
+models; it does not measure recognition accuracy or run the real Core ML models.
+The release build runs these checks and compiles against the pinned real FluidAudio SDK.

@@ -1,7 +1,7 @@
 # Установка OpenSuperWhisper / Installation
 
-Эта сборка форка AlexandrVP включает фильтр повторяющихся фраз Whisper и редактор
-списка фраз. Требуется **Mac с Apple Silicon (M1 или новее), macOS 15 или новее**.
+Эта сборка форка AlexandrVP включает общий фильтр фраз для Whisper, Parakeet v2
+и v3 (с 0.1.3) и редактор списка фраз. Требуется **Mac с Apple Silicon (M1 или новее), macOS 15 или новее**.
 Intel и Windows не поддерживаются. Xcode, Homebrew и Git для установки не нужны.
 
 1. Скачайте `OpenSuperWhisper-<версия>-macOS-arm64.zip` из
@@ -28,7 +28,10 @@ Intel и Windows не поддерживаются. Xcode, Homebrew и Git дл�
    удерживайте её во время речи, затем отпустите. Сначала можно проверить запись
    кнопкой приложения.
 7. Фильтр находится в **Settings → Transcription → Output Options → Filter Known
-   Whisper Phrases**. Кнопка **«Посмотреть фразы…»** открывает редактируемые списки.
+   Phrases**. Кнопка **«Посмотреть фразы…»** открывает редактируемые списки. С версии
+   0.1.3 переключатель и списки общие для Whisper и Parakeet v2/v3 и доступны при
+   выборе любого движка. Ранее сохранённые списки и состояние переключателя сохраняются.
+   Parakeet v2 распознаёт только английский; фильтр не добавляет поддержку языков.
 
 ## Обновление и разрешения
 
@@ -54,7 +57,9 @@ Download a model in onboarding and click Continue. Grant Microphone and Accessib
 also grant Input Monitoring for single-modifier shortcuts. Restart the app.
 Choose your microphone and configure the recording shortcut. Models are not
 included in the archive; Whisper V3 Large is `large-v3-turbo`, about 1.6 GB.
-The editable phrase filter is under Settings → Transcription → Output Options.
+The editable phrase filter is under Settings → Transcription → Output Options →
+Filter Known Phrases. Since 0.1.3, Whisper and Parakeet v2/v3 share the same switch
+and saved lists. Existing preferences are preserved. Parakeet v2 remains English-only.
 
 After an update, macOS may require removing and re-adding the app in Accessibility
 and Input Monitoring because the ad-hoc signature changes. Keep your models and

@@ -15,8 +15,8 @@ then push a new version tag on that commit:
 ```sh
 git switch develop
 git pull --ff-only
-git tag -a v0.1.2 -m 'OpenSuperWhisper 0.1.2'
-git push origin v0.1.2
+git tag -a v0.1.3 -m 'OpenSuperWhisper 0.1.3'
+git push origin v0.1.3
 ```
 
 Tags must be `vMAJOR.MINOR.PATCH`. Update `docs/release-notes.md` before tagging.
@@ -36,7 +36,8 @@ Requires a Mac, full Xcode 26.2 or newer, Homebrew, Rust with the
 pinned Homebrew ARM64/macOS 15 libomp bottle (with SHA-256 verification) on either host
 architecture; it does not install that bottle. All bundled Mach-O deployment
 targets are checked. With rustup, run `rustup target add aarch64-apple-darwin`.
-Filter tests run on the host architecture. The app launch smoke test runs only
+Filter and Parakeet integration checks run on the host architecture.
+The Parakeet checks use a stub ASR backend, not downloaded models. The app launch smoke test runs only
 on ARM64 hosts; an Intel build requires a separate installation/launch check on
 Apple Silicon before claiming runtime verification.
 
@@ -44,10 +45,10 @@ Apple Silicon before claiming runtime verification.
 git submodule update --init --recursive
 brew install cmake libomp rust
 DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer \
-  BUILD_NUMBER=14 bash Scripts/build-release.sh 0.1.1
+  BUILD_NUMBER=14 bash Scripts/build-release.sh 0.1.3
 ```
 
-Output: `dist/OpenSuperWhisper-0.1.1-macOS-arm64.zip` and `.zip.sha256`.
+Output: `dist/OpenSuperWhisper-0.1.3-macOS-arm64.zip` and `.zip.sha256`.
 The script never replaces the installed application or copies user data/models.
 The binary uses M1-compatible ARM instructions, not the build machine's native
 CPU flags. Metal remains enabled. The minimum supported OS is macOS 15.

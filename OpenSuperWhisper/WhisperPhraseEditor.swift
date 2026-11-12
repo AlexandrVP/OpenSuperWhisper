@@ -14,7 +14,7 @@ struct WhisperPhraseEditor: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Фразы фильтра Whisper").font(.headline)
+            Text("Фразы фильтра транскрипции").font(.headline)
             Picker("Где удалять фразу", selection: $editsEndings) {
                 Text("Только в конце записи").tag(true)
                 Text("В любом месте записи").tag(false)

@@ -90,7 +90,13 @@ class FluidAudioEngine: TranscriptionEngine {
         // Finalize
         onProgressUpdate?(0.95)
         
-        var processedText = result.text.trimmingCharacters(in: .whitespacesAndNewlines)
+        // Both Parakeet versions share the same saved phrase lists and switch
+        // as Whisper. Filter decoder text before trimming and autocorrection.
+        var processedText = WhisperHallucinationFilter.filterSegments(
+            [result.text],
+            enabled: settings.filterWhisperHallucinations,
+            phrases: settings.whisperFilterPhrases
+        ).joined().trimmingCharacters(in: .whitespacesAndNewlines)
         
         if settings.shouldApplyAsianAutocorrect && !processedText.isEmpty {
             processedText = AutocorrectWrapper.format(processedText)

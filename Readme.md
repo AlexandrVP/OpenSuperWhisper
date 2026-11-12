@@ -1,8 +1,8 @@
-# OpenSuperWhisper — редактируемый фильтр фраз Whisper
+# OpenSuperWhisper — фильтр фраз для Whisper и Parakeet
 
 Форк [Starmel/OpenSuperWhisper](https://github.com/Starmel/OpenSuperWhisper) от
 [AlexandrVP](https://github.com/AlexandrVP/OpenSuperWhisper): голосовой ввод для macOS
-с фильтром типичных ложных фраз Whisper и редактором списка прямо в приложении.
+с общим фильтром фраз для Whisper, Parakeet v2 и v3 и редактором списка прямо в приложении.
 
 **[Скачать готовое приложение](https://github.com/AlexandrVP/OpenSuperWhisper/releases/latest)**
 · [Подробная инструкция / Installation guide](docs/install.md)
@@ -16,13 +16,15 @@
 
 ## Чем этот форк отличается от оригинала
 
-- **Фильтр известных ложных фраз Whisper.** Удаляет совпадения со списком типичных
+- **Общий фильтр фраз для Whisper и Parakeet v2/v3 (с 0.1.3).** Удаляет совпадения со списком типичных
   субтитров и завершающих фраз, например «Субтитры создавал Дима Торзок» и
   «Продолжение следует». Включён по умолчанию, его можно отключить в настройках.
 - **Редактор фраз в приложении.** Кнопка **«Посмотреть фразы…»** открывает два списка:
   целые фразы в любом месте записи и фразы только в её конце. Можно добавлять,
   изменять и удалять строки, сохранять свой список и возвращать значения по умолчанию.
   Изменения сохраняются локально и применяются к следующим транскрипциям.
+  Существующие списки и состояние переключателя сохраняются при обновлении; они общие
+  для всех трёх движков. Parakeet v2 по-прежнему распознаёт только английский язык.
 - **Исправленный первый запуск в 0.1.2.** После скачивания и выбора модели кнопка
   **Continue** загружает её без перезапуска приложения. Устранена ошибка
   **Model could not be loaded**, возникавшая из-за инициализации до выбора модели.
@@ -32,8 +34,9 @@
   не нужны. Модели скачиваются отдельно.
 
 Фильтр находится в **Settings → Transcription → Output Options → Filter Known
-Whisper Phrases**. Он работает с результатом Whisper при диктовке и обработке
-аудиофайлов; Parakeet и уже сохранённую историю не меняет. Это сопоставление текста
+Phrases** (до 0.1.3 — **Filter Known Whisper Phrases**). Переключатель и редактор
+доступны при выборе Whisper и Parakeet. Фильтр работает при диктовке и обработке
+аудиофайлов; уже сохранённую историю не меняет. Это сопоставление текста
 со списком, поэтому фильтр не обнаруживает все галлюцинации и может удалить реально
 произнесённую фразу из списка. При намеренной диктовке таких фраз отключите фильтр
 или отредактируйте список. [Правила, ограничения и источники](docs/whisper_hallucination_filter.md).
@@ -113,12 +116,15 @@ Whisper Phrases**. Он работает с результатом Whisper пр�
 
 ## English quick start
 
-This fork adds an editable, opt-out filter for recurring Whisper subtitle credits
-and closing phrases, fixes loading the selected model on first-run Continue in
-0.1.2, and provides automatically built release ZIPs. The filter applies to Whisper
-dictation and audio files, not Parakeet or existing history. It matches text against
-lists and can remove an intentionally spoken matching phrase; edit the lists or
-disable it when needed.
+This fork adds an editable, opt-out phrase filter shared by **Whisper, Parakeet v2
+and Parakeet v3 since 0.1.3**, fixes loading the selected model on first-run Continue
+in 0.1.2, and provides automatically built release ZIPs. The filter applies to new
+dictation and audio-file transcriptions; existing history is unchanged. Your saved
+lists and enabled/disabled preference survive the update and apply to all engines.
+Parakeet v2 remains English-only. Find **Filter Known Phrases** and **«Посмотреть
+фразы…»** under Settings → Transcription → Output Options with either engine selected.
+Matching text can include an intentionally spoken phrase; edit the lists or disable
+the filter when needed.
 
 Download the **arm64 ZIP** from [the latest release](https://github.com/AlexandrVP/OpenSuperWhisper/releases/latest),
 extract it and move the app to Applications. Requires **Apple Silicon and macOS 15+**;
@@ -171,7 +177,7 @@ Requires full Xcode 26.2 or newer and Rust targeting `aarch64-apple-darwin`. Ope
 git clone --recurse-submodules https://github.com/AlexandrVP/OpenSuperWhisper.git
 cd OpenSuperWhisper
 brew install cmake libomp rust
-DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer bash Scripts/build-release.sh 0.1.2
+DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer bash Scripts/build-release.sh 0.1.3
 ```
 
 The ZIP and SHA-256 checksum are written to `dist/`. GitHub Actions builds the same ZIP for branch pushes and pull requests; pushing a `vMAJOR.MINOR.PATCH` tag publishes a release after successful checks. See [release maintenance](docs/release_build.md).

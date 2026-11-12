@@ -958,25 +958,23 @@ struct SettingsView: View {
                                 .labelsHidden()
                         }
 
-                        if viewModel.selectedEngine == "whisper" {
-                            VStack(alignment: .leading, spacing: 5) {
-                                Toggle(isOn: $viewModel.filterWhisperHallucinations) {
-                                    VStack(alignment: .leading, spacing: 2) {
-                                        Text("Filter Known Whisper Phrases")
-                                            .font(.subheadline)
-                                        Text("Removes common subtitle credits and closing phrases. Turn off when dictating these phrases intentionally.")
-                                            .font(.caption)
-                                            .foregroundColor(.secondary)
-                                    }
-                                    .frame(maxWidth: .infinity, alignment: .leading)
+                        VStack(alignment: .leading, spacing: 5) {
+                            Toggle(isOn: $viewModel.filterWhisperHallucinations) {
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text("Filter Known Phrases")
+                                        .font(.subheadline)
+                                    Text("Uses the same phrase lists for Whisper and Parakeet v2/v3. Turn off when dictating these phrases intentionally.")
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
                                 }
-                                .toggleStyle(SwitchToggleStyle(tint: Color.accentColor))
-                                Button("Посмотреть фразы…") { showsWhisperPhrases = true }
-                                    .controlSize(.small)
-                                    .sheet(isPresented: $showsWhisperPhrases) {
-                                        WhisperPhraseEditor(phrases: .load())
-                                    }
+                                .frame(maxWidth: .infinity, alignment: .leading)
                             }
+                            .toggleStyle(SwitchToggleStyle(tint: Color.accentColor))
+                            Button("Посмотреть фразы…") { showsWhisperPhrases = true }
+                                .controlSize(.small)
+                                .sheet(isPresented: $showsWhisperPhrases) {
+                                    WhisperPhraseEditor(phrases: .load())
+                                }
                         }
                         
                         HStack {

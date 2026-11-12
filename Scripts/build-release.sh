@@ -3,11 +3,11 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-version="${1:-0.1.2}"
+version="${1:-0.1.3}"
 build_number="${BUILD_NUMBER:-14}"
 deployment_target="15.0"
 if [[ ! "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || [[ ! "$build_number" =~ ^[0-9]+$ ]]; then
-    echo "Usage: BUILD_NUMBER=14 $0 0.1.2" >&2
+    echo "Usage: BUILD_NUMBER=14 $0 0.1.3" >&2
     exit 1
 fi
 if [[ "$(uname -s)" != Darwin ]]; then
@@ -66,6 +66,7 @@ xcrun swiftc -D FILTER_STANDALONE_TEST \
     OpenSuperWhisperTests/WhisperHallucinationFilterTests.swift \
     -o build/phrase-filter-tests
 build/phrase-filter-tests
+bash Scripts/check-parakeet-filter.sh
 
 xcodebuild -project OpenSuperWhisper.xcodeproj -scheme OpenSuperWhisper \
     -configuration Release -destination 'generic/platform=macOS' \
