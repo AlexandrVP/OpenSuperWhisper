@@ -11,16 +11,22 @@ Intel и Windows не поддерживаются. Xcode, Homebrew и Git дл�
    Если заменяете старую версию, сначала завершите её через меню приложения.
 3. Запустите приложение. Эта сборка имеет локальную подпись (ad hoc), без Apple
    Developer ID и нотариализации. Если macOS не может проверить разработчика,
-   после первой попытки запуска откройте **Системные настройки → Конфиденциальность
-   и безопасность → Всё равно открыть**. Используйте это только для скачанной
-   вами сборки, которой доверяете. [Инструкция Apple](https://support.apple.com/102445).
-4. Разрешите **Микрофон** и **Универсальный доступ**. Для глобальной клавиши вроде
+   выберите **«Готово» / «Отмена»**, а не «Переместить в Корзину»: последняя кнопка
+   удаляет приложение из «Программ». Затем откройте **Системные настройки →
+   Конфиденциальность и безопасность → Всё равно открыть** и подтвердите запуск
+   в следующем окне; при необходимости используйте Touch ID или пароль Mac.
+   Используйте это только для скачанной вами сборки, которой доверяете.
+   [Инструкция Apple](https://support.apple.com/102445).
+4. На начальном экране выберите язык, клавишу и скачайте модель. Для русского
+   языка подойдёт **Whisper V3 Large** (`large-v3-turbo`, примерно **1,6 ГБ**).
+   Модель скачивается отдельно, в ZIP её нет. Дождитесь загрузки и нажмите
+   **Continue**; в 0.1.2 для применения выбора модели перезапуск не нужен.
+5. Разрешите **Микрофон** и **Универсальный доступ**. Для глобальной клавиши вроде
    правой Option также включите **Мониторинг ввода** для приложения. Перезапустите
    приложение после выдачи разрешений.
-5. В приложении выберите микрофон и скачайте модель. Для русского языка подойдёт
-   **Whisper V3 Large**; модель скачивается отдельно, в ZIP её нет.
-6. Выберите клавишу записи. При включённом **Hold to Record** удерживайте её во
-   время речи, затем отпустите. Сначала можно проверить запись кнопкой приложения.
+6. Проверьте выбранный микрофон и клавишу записи. При включённом **Hold to Record**
+   удерживайте её во время речи, затем отпустите. Сначала можно проверить запись
+   кнопкой приложения.
 7. Фильтр находится в **Settings → Transcription → Output Options → Filter Known
    Whisper Phrases**. Кнопка **«Посмотреть фразы…»** открывает редактируемые списки.
 
@@ -42,12 +48,13 @@ ZIP (not “Source code”), extract it, and move the app into Applications. Qui
 old app before replacing it. No Xcode, Homebrew or Git is needed to run the app.
 
 This build is ad-hoc signed and is not notarized by Apple. For a trusted download,
-use System Settings → Privacy & Security → Open Anyway after the first launch
-attempt if macOS cannot verify the developer. Grant Microphone and Accessibility;
+choose Done/Cancel if macOS cannot verify the developer, then use System Settings
+→ Privacy & Security → Open Anyway and confirm. Move to Trash removes the app.
+Download a model in onboarding and click Continue. Grant Microphone and Accessibility;
 also grant Input Monitoring for single-modifier shortcuts. Restart the app.
-Choose your microphone, download a model, and configure the recording shortcut.
-Models are not included in the archive. The editable phrase filter is under
-Settings → Transcription → Output Options.
+Choose your microphone and configure the recording shortcut. Models are not
+included in the archive; Whisper V3 Large is `large-v3-turbo`, about 1.6 GB.
+The editable phrase filter is under Settings → Transcription → Output Options.
 
 After an update, macOS may require removing and re-adding the app in Accessibility
 and Input Monitoring because the ad-hoc signature changes. Keep your models and
